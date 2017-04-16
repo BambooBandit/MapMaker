@@ -168,10 +168,16 @@ public class MapButton {
                 buttonId = id;
                 tiles = clockRotation(tiles);
             }
-      //      else if(id == -6)
-      //      {
-      //          buttonId = id;
-      //      }
+            else if(id == -6)
+            {
+                for(int i = 0; i < tiles.length; i++)
+                {
+                    for(int j = 0; j < tiles[0].length; j++)
+                    {
+                        tiles[i][j] = selectedTile;
+                    }
+                }
+            }
             return true;
         }
         return false;

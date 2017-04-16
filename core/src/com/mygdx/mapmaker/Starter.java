@@ -2,30 +2,23 @@ package com.mygdx.mapmaker;
 
 import com.badlogic.gdx.Game;
 
-import java.util.Scanner;
+import javax.swing.*;
 
 public class Starter extends Game {
     Integer[][] tiles;
     int mapWidth, mapHeight, tileSize, baseSize;
 
-    Scanner scanner;
-
     @Override
     public void create () {
 
-        scanner = new Scanner(System.in);
         System.out.println("Enter the original size of the tile");
-     //   baseSize = scanner.nextInt();
-        baseSize = 64; // delete later
+        baseSize = Integer.parseInt(JOptionPane.showInputDialog("Enter the original size of the tile"));
         System.out.println("Enter the size of a tile");
-      //  tileSize = scanner.nextInt();
-        tileSize = 64; //delete later
+        tileSize = Integer.parseInt(JOptionPane.showInputDialog("Enter the size of a tile"));
         System.out.println("Enter the desired map width");
-      //  mapWidth = scanner.nextInt();
-        mapWidth = 15; //delete later
+        mapWidth = Integer.parseInt(JOptionPane.showInputDialog("Enter the desired map width"));
         System.out.println("Enter the desired map height");
-     //   mapHeight = scanner.nextInt();
-        mapHeight = 10; // delete later
+        mapHeight = Integer.parseInt(JOptionPane.showInputDialog("Enter the desired map height"));
         tiles = new Integer[mapWidth][mapHeight];
         setScreen(new MapMaker(baseSize, tileSize, tiles));
     }

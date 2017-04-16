@@ -1,6 +1,7 @@
 package com.mygdx.mapmaker;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -20,6 +21,7 @@ public class MapMaker implements Screen {
 
 	static Vector2 selectSnapper;
 	static Vector2 selectDragger;
+	static Vector2 camera;
 
 	static Array<MapButton> buttons;
 	static Array<MapButton> palleteButtons;
@@ -28,6 +30,7 @@ public class MapMaker implements Screen {
 	MapButton propertiesButton;
 	MapButton flipCounterButton;
 	MapButton flipClockButton;
+	MapButton bucketButton;
 	//MapButton selectButton;
 
 	static int scrollAmount = 0;
@@ -67,6 +70,7 @@ public class MapMaker implements Screen {
 	@Override
 	public void show()
 	{
+		camera = new Vector2(0,0);
 		selectSnapper = new Vector2();
 		selectDragger = new Vector2();
 		buttons = new Array<MapButton>();
@@ -102,6 +106,15 @@ public class MapMaker implements Screen {
 		}
 		windowWidth += 300;
 
+		if(windowWidth > 1700)
+		{
+			windowWidth = 1700;
+		}
+		if(windowHeight > 900)
+		{
+			windowHeight = 900;
+		}
+
 		viewportMultiplier = new Vector2(windowWidth / Gdx.graphics.getWidth(), windowHeight / Gdx.graphics.getHeight());
 
 		resize((int) windowWidth, (int) windowHeight);
@@ -133,6 +146,7 @@ public class MapMaker implements Screen {
 		batch = new SpriteBatch();
 
 	//	selectButton = new MapButton(new Sprite(new Texture("select.png")), new Sprite(new Texture("selectPress.png")), ((mapWidth * tileSize) + 20 + tileSize * 3), ((mapHeight * tileSize)) - (7 * tileSize) - 100, 64, 64, true, -6);
+		bucketButton = new MapButton(new Sprite(new Texture("bucket.png")), new Sprite(new Texture("bucketPress.png")), ((mapWidth * tileSize) + 20 + tileSize * 3), ((mapHeight * tileSize)) - (7 * tileSize) - 100, 64, 64, true, -6);
 		flipClockButton = new MapButton(new Sprite(new Texture("flipClock.png")), new Sprite(new Texture("flipClockPress.png")), ((mapWidth * tileSize) + 20 + tileSize * 2), ((mapHeight * tileSize)) - (7 * tileSize) - 100, 64, 64, true, -5);
 		flipCounterButton = new MapButton(new Sprite(new Texture("flipCounter.png")), new Sprite(new Texture("flipCounterPress.png")), ((mapWidth * tileSize) + 20 + tileSize), ((mapHeight * tileSize)) - (7 * tileSize) - 100, 64, 64, true, -4);
 		generateButton = new MapButton(new Sprite(new Texture("generate.png")), new Sprite(new Texture("generatePress.png")), ((mapWidth * tileSize) + 90), 20, 120, 45, true, -3);
@@ -143,6 +157,7 @@ public class MapMaker implements Screen {
 		buttons.add(propertiesButton);
 		buttons.add(flipCounterButton);
 		buttons.add(flipClockButton);
+		buttons.add(bucketButton);
 	//	buttons.add(selectButton);
 	}
 
@@ -154,6 +169,18 @@ public class MapMaker implements Screen {
 
 		batch.begin();
 		batch.setColor(placedAlpha);
+		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
+			camera.y += 10;
+		}
+		else if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
+			camera.y -= 10;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
+			camera.x -= 10;
+		}
+		else if (Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
+			camera.x += 10;
+		}
 
 		for(int i = 0; i < tiles.length; i ++)
 		{
@@ -161,21 +188,15 @@ public class MapMaker implements Screen {
 			{
 				if(tiles[i][j] != null && tiles[i][j] >= 0)
 				{
-					batch.draw(paletteTextures.get(tiles[i][j]), i * tileSize / viewportMultiplier.x, j * tileSize / viewportMultiplier.y, tileSize / viewportMultiplier.x, tileSize / viewportMultiplier.y);
+					batch.draw(paletteTextures.get(tiles[i][j]), ((i * tileSize) + camera.x) / viewportMultiplier.x, ((j * tileSize) + camera.y) / viewportMultiplier.y, tileSize / viewportMultiplier.x, tileSize / viewportMultiplier.y);
 				}
 			}
 		}
 
 		batch.setColor(selectedAlpha);
-		if(buttonId == -6)
+		if(selectedTile >= 0)
 		{
-		//	dragSprite.setX((mouseToTileX(Gdx.input.getX()) * tileSize) / viewportMultiplier.x);
-		//	dragSprite.setY((mouseToTileY(Gdx.input.getY()) * tileSize) / viewportMultiplier.y);
-		//	batch.draw(dragSprite, (mouseToTileX(Gdx.input.getX()) * tileSize) / viewportMultiplier.x, (mouseToTileY(Gdx.input.getY()) * tileSize) / viewportMultiplier.y, dragSprite.getWidth() / viewportMultiplier.x, dragSprite.getHeight() / viewportMultiplier.y);
-		}
-		else if(selectedTile >= 0)
-		{
-			batch.draw(paletteTextures.get(selectedTile), (mouseToTileX(Gdx.input.getX()) * tileSize) / viewportMultiplier.x, (mouseToTileY(Gdx.input.getY()) * tileSize) / viewportMultiplier.y, tileSize / viewportMultiplier.x, tileSize / viewportMultiplier.y);
+			batch.draw(paletteTextures.get(selectedTile), (((mouseToTileX2(Gdx.input.getX())) * tileSize)) / viewportMultiplier.x, (((mouseToTileY(Gdx.input.getY()) ) * tileSize)) / viewportMultiplier.y, tileSize / viewportMultiplier.x, tileSize / viewportMultiplier.y);
 		}
 		batch.end();
 		shapeRenderer.setColor(Color.GRAY);
@@ -261,11 +282,24 @@ public class MapMaker implements Screen {
 	{
 		int newPos = pos % tileSize;
 		newPos = pos - newPos;
-		return newPos / tileSize;
+		return (newPos / tileSize);
 	}
+
+	public static int mouseToTileX2(int pos)
+	{
+		int newPos = (pos ) % tileSize;
+		newPos = (pos ) - newPos;
+		return (newPos / tileSize);
+	}
+
 	public static int mouseToTileY(int y){
 		int t = tileSize * mapHeight - mouseToTileX(y) * tileSize;
 		return t / tileSize - 1;
+	}
+
+	public static int mouseToTileY2(int y)
+	{
+		return 0;
 	}
 }
 

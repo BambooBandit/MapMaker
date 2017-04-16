@@ -12,27 +12,7 @@ import static com.mygdx.mapmaker.MapMaker.*;
 public class UserInput implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
-        if(keycode == Input.Keys.NUM_0)
-        {
-            lastSelectedTile = selectedTile;
-            selectedTile = -1;
-        }
-        else if(keycode == Input.Keys.NUM_1)
-        {
-            selectedTile = 0;
-        }
-        else if(keycode == Input.Keys.NUM_2)
-        {
-            selectedTile = 1;
-        }
-        else if(keycode == Input.Keys.NUM_3)
-        {
-            selectedTile = 2;
-        }
-        else if(keycode == Input.Keys.NUM_4)
-        {
-            selectedTile = 3;
-        }
+
         return false;
     }
 
@@ -72,7 +52,7 @@ public class UserInput implements InputProcessor {
         //        return true;
         //    }
             try {
-                tiles[mouseToTileX(Gdx.input.getX())][mouseToTileY(Gdx.input.getY())] = selectedTile;
+                tiles[mouseToTileX(Gdx.input.getX() - (int)camera.x)][mouseToTileY(Gdx.input.getY() + (int)camera.y)] = selectedTile;
             } catch (IndexOutOfBoundsException e) {
 
             }
@@ -108,7 +88,7 @@ public class UserInput implements InputProcessor {
   //      }
 
         try {
-            tiles[mouseToTileX(Gdx.input.getX())][mouseToTileY(Gdx.input.getY())] = selectedTile;
+            tiles[mouseToTileX(Gdx.input.getX() - (int)camera.x)][mouseToTileY(Gdx.input.getY() + (int)camera.y)] = selectedTile;
         } catch (IndexOutOfBoundsException e) {
 
         }
